@@ -18,12 +18,39 @@ struct record
     short int num_of_page;
 };
 
-int display(int i, int sum)
+void GetIndexArr(record** index, record* list)
 {
-    FILE* fp;
-    fp = fopen("testBase1.dat", "rb");
-    record arr[4000] = { 0 };
-    i = fread((record*)arr, sizeof(record), 4000, fp);
+    for (int i = 0; i < 4000; i++)
+    {
+        index[i] = &list[i];
+    }
+}
+
+void quickSort(record** index, int size, int left, int right)
+{
+    int i = left;
+    int j = right;
+    string pivot = index[(left + right) / 2]->title;
+    while (i <= j)
+    {
+        while (index[i]->title < pivot) i++;
+        while (index[j]->title > pivot) j--;
+        if (i <= j)
+        {
+            swap(index[i], index[j]);
+            i++;
+            j--;
+        }
+    }
+
+    if (i < right)
+        quickSort(index, size, i, right);
+    if (j > left)
+        quickSort(index, size, left, j);
+}
+
+int display(int i, int sum, record** index)
+{
     cout << " Num\t" << "||" << " Author" << "\t     "
         << "||" << " Title\t\t\t\t"
         << "||" << " Publisher\t\t"
@@ -32,10 +59,10 @@ int display(int i, int sum)
     cout << "========||===================||=================================||======================||======||======||\n";
     for (int i = sum - 20; i < sum; i++)
     {
-        cout << " " << i + 1 << "\t|| " << arr[i].author << "\t     ||\t" << arr[i].title << "\t|| "
-            << arr[i].publisher << "\t|| "
-            << arr[i].year << "\t||  "
-            << arr[i].num_of_page << "\t|| " << std::endl;
+        cout << " " << i + 1 << "\t|| " << index[i]->author << "\t     ||\t" << index[i]->title << "\t|| "
+            << index[i]->publisher << "\t|| "
+            << index[i]->year << "\t||  "
+            << index[i]->num_of_page << "\t|| " << std::endl;
         cout << "========||===================||=================================||======================||======||======||\n";
     }
     cout << "'<-' Previous page" << "\t\t\t      " << "Exit 'ESC'" << "      \t\t\t" << "Next page '->'";
@@ -47,25 +74,59 @@ int main()
     FILE* fp;
     fp = fopen("testBase1.dat", "rb");
     int i = 0, sum = 20;
-    display(i, sum);
+    int currentStatus = 0;
+    record* list = new record[4000];
+    record** index = new record * [4000];
+    i = fread((record*)list, sizeof(record), 4000, fp);
+    GetIndexArr(index, list);
+    display(i, sum, index);
     while (1)
     {
         switch (_getch())
         {
         case 75:
-            if (i > 0) {
+            if (sum > 20) {
                 system("cls");
                 i = i - 20;
                 sum = sum - 20;
-                display(i, sum);
+                display(i, sum, index);
             }
             break;
         case 77:
-            system("cls");
-            i += 20;
-            sum += 20;
-            display(i, sum);
+            if (sum < 4000) {
+                system("cls");
+                i += 20;
+                sum += 20;
+                display(i, sum, index);
+            }
             break;
+        case 97:
+            system("cls");
+            i = 20;
+            sum = 20;
+            display(i, sum, index);
+            break;
+        case 100:
+            system("cls");
+            i = 4000;
+            sum = 4000;
+            display(i, sum, index);
+            break;
+        case 115:
+            if (currentStatus == 0) {
+                system("cls");
+                quickSort(index, 4000, 0, 3999);
+                display(i, sum, index);
+                currentStatus = 1;
+                break;
+            }
+            if (currentStatus == 1) {
+                system("cls");
+                GetIndexArr(index, list);
+                display(i, sum, index);
+                currentStatus = 0;
+                break;
+            }
         case 27:
             return 0;
         }
