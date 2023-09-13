@@ -65,7 +65,8 @@ int display(int i, int sum, record** index)
             << index[i]->num_of_page << "\t|| " << std::endl;
         cout << "========||===================||=================================||======================||======||======||\n";
     }
-    cout << "'<-' Previous page" << "\t\t\t      " << "Exit 'ESC'" << "      \t\t\t" << "Next page '->'";
+    cout << "'<-' Previous page" << "\t\t\t      " << "Exit 'ESC'" << "      \t\t\t" << "Next page '->'\n";
+    cout << "'A' First page" << "\t\t\t\t " << "Sort and unsort 'S'" << "      \t\t" << "Last page 'D'\n";
     return 0;
 }
 
