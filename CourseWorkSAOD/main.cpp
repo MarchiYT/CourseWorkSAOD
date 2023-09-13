@@ -24,19 +24,19 @@ int display(int i, int sum)
     fp = fopen("testBase1.dat", "rb");
     record arr[4000] = { 0 };
     i = fread((record*)arr, sizeof(record), 4000, fp);
-    cout << "\t\tAuthor" << "     \t"
-        << "||" << "\t\tTitle\t\t\t"
-        << "||" << "\tPublisher\t"
+    cout << " Num\t" << "||" << " Author" << "\t     "
+        << "||" << " Title\t\t\t\t"
+        << "||" << " Publisher\t\t"
         << "||" << " Year "
         << "||  Num ||\n";
-    cout << "=============================||=================================||======================||======||======||\n";
-    for (int i = 0; i < sum; i++)
+    cout << "========||===================||=================================||======================||======||======||\n";
+    for (int i = sum - 20; i < sum; i++)
     {
-        cout << i+1 << "\t||\t" << arr[i].author << "  ||\t" << arr[i].title << "\t|| "
+        cout << " " << i + 1 << "\t|| " << arr[i].author << "\t     ||\t" << arr[i].title << "\t|| "
             << arr[i].publisher << "\t|| "
             << arr[i].year << "\t||  "
             << arr[i].num_of_page << "\t|| " << std::endl;
-        cout << "=============================||=================================||======================||======||======||\n";
+        cout << "========||===================||=================================||======================||======||======||\n";
     }
     cout << "'<-' Previous page" << "\t\t\t      " << "Exit 'ESC'" << "      \t\t\t" << "Next page '->'";
     return 0;
