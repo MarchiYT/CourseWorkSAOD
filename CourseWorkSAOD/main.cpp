@@ -30,12 +30,16 @@ char* GetSurname(record** index, int i)
 {
     char currentWord[32]{};
 
-    for (int j = 0, wordCount = 0; j < 32; j++) {
-        if ((int)index[i]->title[j] == 32) {
+    for (int j = 0, wordCount = 0; j < 32; j++) 
+    {
+        if ((int)index[i]->title[j] == 32) 
+        {
             ++wordCount;
         }
-        if (wordCount == 2) {
-            for (int k = j + 1, count = 0; k < 32; k++, count++) {
+        if (wordCount == 2) 
+        {
+            for (int k = j + 1, count = 0; k < 32; k++, count++) 
+            {
                 currentWord[count] = index[i]->title[k];
             }
             break;
@@ -52,14 +56,15 @@ void quickSort(record** index, int size, int left, int right)
     char surname[32]{};
     char pivot[32]{};
     strcpy(pivot, GetSurname(index, (left + right) / 2));
-
     while (i <= j)
     {
-        while (strcmp(GetSurname(index, i), pivot) < 0) {
+        while (strcmp(GetSurname(index, i), pivot) < 0) 
+        {
             i++;
         }
 
-        while (strcmp(GetSurname(index, j), pivot) > 0) {
+        while (strcmp(GetSurname(index, j), pivot) > 0) 
+        {
             j--;
         }
         if (i <= j)
