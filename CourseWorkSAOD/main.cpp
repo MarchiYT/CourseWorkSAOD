@@ -26,27 +26,31 @@ void GetIndexArr(record** index, record* list)
     }
 }
 
-void GetSurname(record** index, char* surnamelist)
+char* GetSurname(record** index, int i)
 {
-    for (int i = 0; i < 4000; i++)
-    {
-        int counter = 0;
-        char str;
-        char* tok;
-        str = *index[i]->title;
-        tok = strtok(&str, " ");
-        while (tok) {
-            tok = strtok(NULL, " ");
+    int wordCount = 0;
+    char* str = index[i]->title;
+    char delim[1] = {" "};
+    char currentWord[32]{};
+    for (int j = 0; j < 32; j++) {
+        if (str[j] == delim) {
+            ++wordCount;
         }
-        surnamelist[i] = str;
+
+        if (wordCount == 2) {
+            for (int k = j, count = 0; k < 32; k++) {
+                currentWord[count] = index[i]->title[k];
+            }
+            return currentWord;
+        }
     }
 }
 
-void quickSort(record** index, int size, int left, int right, char* surnamelist)
+void quickSort(record** index, int size, int left, int right)
 {
     int i = left;
     int j = right;
-    char pivot = surnamelist[(left + right) / 2];
+    char* pivot = surnamelist[(left + right) / 2];
     while (i <= j)
     {
         while (surnamelist[i] < pivot) i++;
@@ -95,10 +99,9 @@ int main()
     int currentStatus = 0;
     record* list = new record[4000];
     record** index = new record * [4000];
-    char surnamelist[4000];
+    char* surnamelist[4000];
     i = fread((record*)list, sizeof(record), 4000, fp);
     GetIndexArr(index, list);
-    GetSurname(index, surnamelist);
     display(i, sum, index);
     while (1)
     {
@@ -135,7 +138,7 @@ int main()
         case 115:
             if (currentStatus == 0) {
                 system("cls");
-                quickSort(index, 4000, 0, 3999, surnamelist);
+                quickSort(index, 4000, 0, 3999);
                 display(i, sum, index);
                 currentStatus = 1;
                 break;
