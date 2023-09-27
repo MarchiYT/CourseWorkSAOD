@@ -28,33 +28,40 @@ void GetIndexArr(record** index, record* list)
 
 char* GetSurname(record** index, int i)
 {
-    int wordCount = 0;
-    char* str = index[i]->title;
-    char delim[1] = {" "};
     char currentWord[32]{};
-    for (int j = 0; j < 32; j++) {
-        if (str[j] == delim) {
+
+    for (int j = 0, wordCount = 0; j < 32; j++) {
+        if ((int)index[i]->title[j] == 32) {
             ++wordCount;
         }
-
         if (wordCount == 2) {
-            for (int k = j, count = 0; k < 32; k++) {
+            for (int k = j + 1, count = 0; k < 32; k++, count++) {
                 currentWord[count] = index[i]->title[k];
             }
-            return currentWord;
+            break;
         }
     }
+
+    return currentWord;
 }
 
 void quickSort(record** index, int size, int left, int right)
 {
     int i = left;
     int j = right;
-    char* pivot = surnamelist[(left + right) / 2];
+    char surname[32]{};
+    char pivot[32]{};
+    strcpy(pivot, GetSurname(index, (left + right) / 2));
+
     while (i <= j)
     {
-        while (surnamelist[i] < pivot) i++;
-        while (surnamelist[j] > pivot) j--;
+        while (strcmp(GetSurname(index, i), pivot) < 0) {
+            i++;
+        }
+
+        while (strcmp(GetSurname(index, j), pivot) > 0) {
+            j--;
+        }
         if (i <= j)
         {
             swap(index[i], index[j]);
@@ -64,9 +71,9 @@ void quickSort(record** index, int size, int left, int right)
     }
 
     if (i < right)
-        quickSort(index, size, i, right, surnamelist);
+        quickSort(index, size, i, right);
     if (j > left)
-        quickSort(index, size, left, j, surnamelist);
+        quickSort(index, size, left, j);
 }
 
 int display(int i, int sum, record** index)
@@ -99,7 +106,6 @@ int main()
     int currentStatus = 0;
     record* list = new record[4000];
     record** index = new record * [4000];
-    char* surnamelist[4000];
     i = fread((record*)list, sizeof(record), 4000, fp);
     GetIndexArr(index, list);
     display(i, sum, index);
