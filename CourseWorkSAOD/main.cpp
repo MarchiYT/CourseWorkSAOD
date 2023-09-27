@@ -53,7 +53,6 @@ void quickSort(record** index, int size, int left, int right)
 {
     int i = left;
     int j = right;
-    char surname[32]{};
     char pivot[32]{};
     strcpy(pivot, GetSurname(index, (left + right) / 2));
     while (i <= j)
