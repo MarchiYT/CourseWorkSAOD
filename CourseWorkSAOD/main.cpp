@@ -26,15 +26,31 @@ void GetIndexArr(record** index, record* list)
     }
 }
 
-void quickSort(record** index, int size, int left, int right)
+void GetSurname(record** index, char* surnamelist)
+{
+    for (int i = 0; i < 4000; i++)
+    {
+        int counter = 0;
+        char str;
+        char* tok;
+        str = *index[i]->title;
+        tok = strtok(&str, " ");
+        while (tok) {
+            tok = strtok(NULL, " ");
+        }
+        surnamelist[i] = str;
+    }
+}
+
+void quickSort(record** index, int size, int left, int right, char* surnamelist)
 {
     int i = left;
     int j = right;
-    string pivot = index[(left + right) / 2]->title;
+    char pivot = surnamelist[(left + right) / 2];
     while (i <= j)
     {
-        while (index[i]->title < pivot) i++;
-        while (index[j]->title > pivot) j--;
+        while (surnamelist[i] < pivot) i++;
+        while (surnamelist[j] > pivot) j--;
         if (i <= j)
         {
             swap(index[i], index[j]);
@@ -44,9 +60,9 @@ void quickSort(record** index, int size, int left, int right)
     }
 
     if (i < right)
-        quickSort(index, size, i, right);
+        quickSort(index, size, i, right, surnamelist);
     if (j > left)
-        quickSort(index, size, left, j);
+        quickSort(index, size, left, j, surnamelist);
 }
 
 int display(int i, int sum, record** index)
@@ -63,8 +79,9 @@ int display(int i, int sum, record** index)
             << index[i]->publisher << "\t|| "
             << index[i]->year << "\t||  "
             << index[i]->num_of_page << "\t|| " << std::endl;
-        cout << "========||===================||=================================||======================||======||======||\n";
+        //cout << "========||===================||=================================||======================||======||======||\n";
     }
+    cout << "========||===================||=================================||======================||======||======||\n";
     cout << "'<-' Previous page" << "\t\t\t      " << "Exit 'ESC'" << "      \t\t\t" << "Next page '->'\n";
     cout << "'A' First page" << "\t\t\t\t " << "Sort and unsort 'S'" << "      \t\t" << "Last page 'D'\n";
     return 0;
@@ -78,8 +95,10 @@ int main()
     int currentStatus = 0;
     record* list = new record[4000];
     record** index = new record * [4000];
+    char surnamelist[4000];
     i = fread((record*)list, sizeof(record), 4000, fp);
     GetIndexArr(index, list);
+    GetSurname(index, surnamelist);
     display(i, sum, index);
     while (1)
     {
@@ -116,7 +135,7 @@ int main()
         case 115:
             if (currentStatus == 0) {
                 system("cls");
-                quickSort(index, 4000, 0, 3999);
+                quickSort(index, 4000, 0, 3999, surnamelist);
                 display(i, sum, index);
                 currentStatus = 1;
                 break;
