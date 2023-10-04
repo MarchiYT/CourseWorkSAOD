@@ -309,7 +309,7 @@ int main()
             result = BinarySearch(index, input);
             if (result.empty())
             {
-                std::cout << "No one record!";
+                cout << "No record!";
                 Sleep(500);
                 break;
             }
