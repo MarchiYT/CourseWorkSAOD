@@ -18,6 +18,69 @@ struct record
     short int num_of_page;
 };
 
+struct node {
+    record* data;
+    node* next;
+};
+
+struct MyQueue {
+    node* head;
+    node* tail;
+
+    MyQueue() : head(nullptr), tail(nullptr) {}
+
+    void push(record* data) {
+        node* newNode = new node;
+        newNode->data = data;
+        newNode->next = nullptr;
+
+        if (!head) {
+            head = newNode;
+            tail = newNode;
+        }
+        else {
+            tail->next = newNode;
+            tail = newNode;
+        }
+    }
+
+    bool empty() const {
+        return !head;
+    }
+
+    record* front() const {
+        if (head) {
+            return head->data;
+        }
+        throw runtime_error("Queue is empty");
+    }
+
+    void pop() {
+        if (head) {
+            node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    int size() const {
+        int count = 0;
+        node* current = head;
+        while (current) {
+            count++;
+            current = current->next;
+        }
+        return count;
+    }
+};
+
+struct vertex {
+    int balance = 0;
+    vertex* left = nullptr;
+    vertex* right = nullptr;
+    MyQueue data;
+};
+
 void GetIndexArr(record** index, record* list)
 {
     for (int i = 0; i < 4000; i++)
@@ -79,62 +142,6 @@ void quickSort(record** index, int size, int left, int right)
     if (j > left)
         quickSort(index, size, left, j);
 }
-
-struct node {
-    record* data;
-    node* next;
-};
-
-struct MyQueue {
-    node* head;
-    node* tail;
-
-    MyQueue() : head(nullptr), tail(nullptr) {}
-
-    void push(record* data) {
-        node* newNode = new node;
-        newNode->data = data;
-        newNode->next = nullptr;
-
-        if (!head) {
-            head = newNode;
-            tail = newNode;
-        }
-        else {
-            tail->next = newNode;
-            tail = newNode;
-        }
-    }
-
-    bool empty() const {
-        return !head;
-    }
-
-    record* front() const {
-        if (head) {
-            return head->data;
-        }
-        throw runtime_error("Queue is empty");
-    }
-
-    void pop() {
-        if (head) {
-            node* temp = head;
-            head = head->next;
-            delete temp;
-        }
-    }
-
-    int size() const {
-        int count = 0;
-        node* current = head;
-        while (current) {
-            count++;
-            current = current->next;
-        }
-        return count;
-    }
-};
 
 MyQueue BinarySearch(record** index, const string& targetKey) {
     MyQueue result; 
@@ -230,11 +237,124 @@ int display(int i, int sum, record** index)
     return 0;
 }
 
+void LL_povorot(vertex*& p) 
+{
+    vertex* q = p->left;
+    q->balance = 0;
+    p->balance = 0;
+    p->left = q->right;
+    q->right = p;
+    p = q;
+}
+
+void RR_povorot(vertex*& p) 
+{
+    vertex* q = p->right;
+    p->balance = 0;
+    q->balance = 0;
+    p->right = q->left;
+    q->left = p;
+    p = q;
+}
+
+void LR_povorot(vertex*& p) 
+{
+    vertex* q = p->left;
+    vertex* r = q->right;
+    if (r->balance < 0) {
+        p->balance = 1;
+    }
+    else {
+        p->balance = 0;
+    }
+    if (r->balance > 0) {
+        q->balance = -1;
+    }
+    else {
+        q->balance = 0;
+    }
+    r->balance = 0;
+    q->right = r->left;
+    p->left = r->right;
+    r->left = q;
+    r->right = p;
+    p = r;
+}
+
+void RL_povorot(vertex*& p) 
+{
+    vertex* q = p->right;
+    vertex* r = q->left;
+    if (r->balance < 0) {
+        p->balance = -1;
+    }
+    else {
+        p->balance = 0;
+    }
+    if (r->balance < 0) {
+        q->balance = 1;
+    }
+    else {
+        q->balance = 0;
+    }
+    r->balance = 0;
+    q->left = r->right;
+    p->right = r->left;
+    r->right = q;
+    r->left = p;
+    p = r;
+}
+
+void insert(vertex*& p, MyQueue newData) {
+    if (p == nullptr) {
+        p = new vertex;
+        p->data = newData;
+        p->balance = 0;
+    }
+    else if (newData.head->data->year < p->data.head->data->year) {
+        insert(p->left, newData);
+        if (p->left->balance == -2) {
+            if (newData.head->data->year < p->data.head->data->year) {
+                LL_povorot(p);
+            }
+            else {
+                LR_povorot(p);
+            }
+        }
+    }
+    else {
+        insert(p->right, newData);
+        if (p->right->balance == 2) {
+            if (newData.head->data->year > p->data.head->data->year) {
+                RR_povorot(p);
+            }
+            else {
+                RL_povorot(p);
+            }
+        }
+    }
+}
+int dfg = 0;
+void LeftToRight(vertex* p) 
+{
+    if (p != nullptr) {
+        LeftToRight(p->left);
+        if (dfg == 4000) dfg = 0;
+        dfg++;
+        cout << " " << dfg << "\t|| " << p->data.head->data->author << "\t     ||\t" << p->data.head->data->title << "\t|| "
+            << p->data.head->data->publisher << "\t|| "
+            << p->data.head->data->year << "\t||  "
+            << p->data.head->data->num_of_page << "\t|| " << std::endl;
+        LeftToRight(p->right);
+    }
+}
+
 int main()
 {
     FILE* fp;
     fp = fopen("testBase1.dat", "rb");
     int i = 0, sum = 20;
+    vertex* root = nullptr;
     string input;
     int currentStatus = 0;
     record* list = new record[4000];
@@ -248,7 +368,7 @@ int main()
         switch (_getch())
         {
         case 75:
-            if (sum > 20 && currentStatus != 2) {
+            if (sum > 20 && currentStatus != 2 && currentStatus != 3) {
                 system("cls");
                 i = i - 20;
                 sum = sum - 20;
@@ -262,7 +382,7 @@ int main()
             }
             break;
         case 77:
-            if (sum < 4000 && currentStatus != 2) {
+            if (sum < 4000 && currentStatus != 2 && currentStatus != 3) {
                 system("cls");
                 i += 20;
                 sum += 20;
@@ -303,21 +423,46 @@ int main()
                 break;
             }
         case 102:
-            system("cls");
-            cout << "Write your letters: ";
-            cin >> input;
-            result = BinarySearch(index, input);
-            if (result.empty())
-            {
-                cout << "No record!";
-                Sleep(500);
-                break;
-            }
-            else
+            if (currentStatus == 1)
             {
                 system("cls");
-                printQueue(result, sum/20);
-                currentStatus = 2;
+                cout << "Write your letters: ";
+                cin >> input;
+                result = BinarySearch(index, input);
+                if (result.empty())
+                {
+                    cout << "No record!";
+                    Sleep(500);
+                    break;
+                }
+                else
+                {
+                    system("cls");
+                    printQueue(result, sum / 20);
+                    currentStatus = 2;
+                }
+            }
+            break;
+        case 116:
+            if (currentStatus == 2)
+            {
+                system("cls");
+                root = nullptr;
+                for (int i = 0; i < 4000; i++)
+                {
+                    insert(root, result);
+                }
+                LeftToRight(root);
+                currentStatus = 3;
+                break;
+            }
+            if (currentStatus == 3)
+            {
+                system("cls");
+                GetIndexArr(index, list);
+                display(i, sum, index);
+                currentStatus = 0;
+                break;
             }
             break;
         case 27:
