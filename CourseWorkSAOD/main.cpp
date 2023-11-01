@@ -74,13 +74,6 @@ struct MyQueue {
     }
 };
 
-struct vertex {
-    int balance = 0;
-    vertex* left = nullptr;
-    vertex* right = nullptr;
-    MyQueue data;
-};
-
 void GetIndexArr(record** index, record* list)
 {
     for (int i = 0; i < 4000; i++)
@@ -237,115 +230,133 @@ int display(int i, int sum, record** index)
     return 0;
 }
 
-void LL_povorot(vertex*& p) 
+/*АВЛ-Дерево*/
+struct Vertex
 {
-    vertex* q = p->left;
-    q->balance = 0;
-    p->balance = 0;
-    p->left = q->right;
-    q->right = p;
-    p = q;
+    MyQueue Data;
+    Vertex* Left = nullptr;
+    Vertex* Right = nullptr;
+};
+
+/*Вращения*/
+
+Vertex* LLRotation(Vertex* root)
+{
+    Vertex* newRoot = root->Left;
+    root->Left = newRoot->Right;
+    newRoot->Right = root;
+    return newRoot;
 }
 
-void RR_povorot(vertex*& p) 
+Vertex* RRRotation(Vertex* root)
 {
-    vertex* q = p->right;
-    p->balance = 0;
-    q->balance = 0;
-    p->right = q->left;
-    q->left = p;
-    p = q;
+    Vertex* newRoot = root->Right;
+    root->Right = newRoot->Left;
+    newRoot->Left = root;
+    return newRoot;
 }
 
-void LR_povorot(vertex*& p) 
+Vertex* LRRotation(Vertex* root)
 {
-    vertex* q = p->left;
-    vertex* r = q->right;
-    if (r->balance < 0) {
-        p->balance = 1;
-    }
-    else {
-        p->balance = 0;
-    }
-    if (r->balance > 0) {
-        q->balance = -1;
-    }
-    else {
-        q->balance = 0;
-    }
-    r->balance = 0;
-    q->right = r->left;
-    p->left = r->right;
-    r->left = q;
-    r->right = p;
-    p = r;
+    root->Left = RRRotation(root->Left);
+    return LLRotation(root);
 }
 
-void RL_povorot(vertex*& p) 
+Vertex* RLRotation(Vertex* root)
 {
-    vertex* q = p->right;
-    vertex* r = q->left;
-    if (r->balance < 0) {
-        p->balance = -1;
-    }
-    else {
-        p->balance = 0;
-    }
-    if (r->balance < 0) {
-        q->balance = 1;
-    }
-    else {
-        q->balance = 0;
-    }
-    r->balance = 0;
-    q->left = r->right;
-    p->right = r->left;
-    r->right = q;
-    r->left = p;
-    p = r;
+    root->Right = LLRotation(root->Right);
+    return RRRotation(root);
 }
 
-void insert(vertex*& p, MyQueue newData) {
-    if (p == nullptr) {
-        p = new vertex;
-        p->data = newData;
-        p->balance = 0;
+/*Высота дерева*/
+int TreeHeight(Vertex* vertex)
+{
+    if (vertex == nullptr)
+    {
+        return 0;
     }
-    else if (newData.head->data->year < p->data.head->data->year) {
-        insert(p->left, newData);
-        if (p->left->balance == -2) {
-            if (newData.head->data->year < p->data.head->data->year) {
-                LL_povorot(p);
-            }
-            else {
-                LR_povorot(p);
-            }
+    else
+    {
+        int LHeight = TreeHeight(vertex->Left);
+        int RHeight = TreeHeight(vertex->Right);
+        return 1 + max(LHeight, RHeight);
+    }
+}
+
+/*Построение дерева*/
+Vertex* BuildAVLTree(Vertex*& vertex, MyQueue value)
+{
+    if (vertex == nullptr)
+    {
+        vertex = new Vertex;
+        vertex->Data = value;
+    }
+    else if (value.head->data->year < vertex->Data.head->data->year)
+    {
+        vertex->Left = BuildAVLTree(vertex->Left, value);
+    }
+    else if (value.head->data->year > vertex->Data.head->data->year)
+    {
+        vertex->Right = BuildAVLTree(vertex->Right, value);
+    }
+
+    // Обновление баланса и проверка на нарушение баланса
+    int balance = TreeHeight(vertex->Left) - TreeHeight(vertex->Right);
+
+    // Слева перевес (нужно выполнить вращение LL или LR)
+    if (balance > 1)
+    {
+        if (value.head->data->year < vertex->Data.head->data->year)
+        {
+            // Левое-Левое (LL) вращение
+            vertex = LLRotation(vertex);
+        }
+        else
+        {
+            // Левое-Правое (LR) вращение
+            vertex = LRRotation(vertex);
         }
     }
-    else {
-        insert(p->right, newData);
-        if (p->right->balance == 2) {
-            if (newData.head->data->year > p->data.head->data->year) {
-                RR_povorot(p);
-            }
-            else {
-                RL_povorot(p);
-            }
+    // Справа перевес (нужно выполнить вращение RR или RL)
+    else if (balance < -1)
+    {
+        if (value.head->data->year > vertex->Data.head->data->year)
+        {
+            // Правое-Правое (RR) вращение
+            vertex = RRRotation(vertex);
+        }
+        else
+        {
+            // Правое-Левое (RL) вращение
+            vertex = RLRotation(vertex);
         }
     }
+
+    return vertex;
 }
 int dfg = 0;
-void LeftToRight(vertex* p) 
+
+int LeftToRight(Vertex* root)
 {
-    if (p != nullptr) {
-        LeftToRight(p->left);
+    while (!(root == nullptr))
+    {
+        LeftToRight(root->Left);
+
+        LeftToRight(root->Right);
+
         if (dfg == 4000) dfg = 0;
         dfg++;
-        cout << " " << dfg << "\t|| " << p->data.head->data->author << "\t     ||\t" << p->data.head->data->title << "\t|| "
-            << p->data.head->data->publisher << "\t|| "
-            << p->data.head->data->year << "\t||  "
-            << p->data.head->data->num_of_page << "\t|| " << std::endl;
-        LeftToRight(p->right);
+
+        std::cout << " " << dfg << "\t|| " << root->Data.head->data->author << "\t||\t" << root->Data.head->data->title << "\t||"
+            << root->Data.head->data->publisher << "\t||"
+            << root->Data.head->data->year << "\t||"
+            << root->Data.head->data->num_of_page << "\t||" << std::endl;
+        root->Data.head = root->Data.head->next;
+        if (root->Data.head->next == nullptr)
+            return 0;
+        else {
+            return LeftToRight(root);
+        }
     }
 }
 
@@ -354,12 +365,12 @@ int main()
     FILE* fp;
     fp = fopen("testBase1.dat", "rb");
     int i = 0, sum = 20;
-    vertex* root = nullptr;
+    Vertex* Root_AVL;
+    MyQueue result{};
     string input;
     int currentStatus = 0;
     record* list = new record[4000];
     record** index = new record * [4000];
-    MyQueue result{};
     i = fread((record*)list, sizeof(record), 4000, fp);
     GetIndexArr(index, list);
     display(i, sum, index);
@@ -447,12 +458,19 @@ int main()
             if (currentStatus == 2)
             {
                 system("cls");
-                root = nullptr;
+                Root_AVL = nullptr;
                 for (int i = 0; i < 4000; i++)
                 {
-                    insert(root, result);
+                    BuildAVLTree(Root_AVL, result);
                 }
-                LeftToRight(root);
+                cout << " Num\t" << "||" << " Author" << "\t     "
+                    << "||" << " Title\t\t\t\t"
+                    << "||" << " Publisher\t\t"
+                    << "||" << " Year "
+                    << "||  Num ||\n";
+                cout << "========||===================||=================================||======================||======||======||\n";
+                LeftToRight(Root_AVL);
+                cout << "========||===================||=================================||======================||======||======||\n";
                 currentStatus = 3;
                 break;
             }
