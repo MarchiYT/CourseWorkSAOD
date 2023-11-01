@@ -366,7 +366,7 @@ int LeftToRight(Vertex* root, const int sost, short int inputt)
                 << root->Data.head->data->num_of_page << "\t||" << std::endl;
         }
         root->Data.head = root->Data.head->next;
-        if (root->Data.head->next == nullptr) 
+        if (root->Data.head == nullptr || root->Data.head->next == nullptr)
             return 0;
         else {
             return LeftToRight(root, sost, inputt);
