@@ -336,26 +336,40 @@ Vertex* BuildAVLTree(Vertex*& vertex, MyQueue value)
 }
 int dfg = 0;
 
-int LeftToRight(Vertex* root)
+int LeftToRight(Vertex* root, const int sost, short int inputt)
 {
     while (!(root == nullptr))
     {
-        LeftToRight(root->Left);
 
-        LeftToRight(root->Right);
+        LeftToRight(root->Left, sost, inputt);
+
+        LeftToRight(root->Right, sost, inputt);
 
         if (dfg == 4000) dfg = 0;
         dfg++;
 
-        std::cout << " " << dfg << "\t|| " << root->Data.head->data->author << "\t||\t" << root->Data.head->data->title << "\t||"
-            << root->Data.head->data->publisher << "\t||"
-            << root->Data.head->data->year << "\t||"
-            << root->Data.head->data->num_of_page << "\t||" << std::endl;
+        if (sost == 1)
+        {
+            if (root->Data.head->data->year == inputt)
+            {
+                std::cout << " " << dfg << "\t|| " << root->Data.head->data->author << "\t||\t" << root->Data.head->data->title << "\t||"
+                    << root->Data.head->data->publisher << "\t||"
+                    << root->Data.head->data->year << "\t||"
+                    << root->Data.head->data->num_of_page << "\t||" << std::endl;
+            }
+        }
+        if (sost == 0)
+        {
+            std::cout << " " << dfg << "\t|| " << root->Data.head->data->author << "\t||\t" << root->Data.head->data->title << "\t||"
+                << root->Data.head->data->publisher << "\t||"
+                << root->Data.head->data->year << "\t||"
+                << root->Data.head->data->num_of_page << "\t||" << std::endl;
+        }
         root->Data.head = root->Data.head->next;
-        if (root->Data.head->next == nullptr)
+        if (root->Data.head->next == nullptr) 
             return 0;
         else {
-            return LeftToRight(root);
+            return LeftToRight(root, sost, inputt);
         }
     }
 }
@@ -365,7 +379,7 @@ int main()
     FILE* fp;
     fp = fopen("testBase1.dat", "rb");
     int i = 0, sum = 20;
-    Vertex* Root_AVL;
+    Vertex* Root_AVL = nullptr;
     MyQueue result{};
     string input;
     int currentStatus = 0;
@@ -453,6 +467,28 @@ int main()
                     currentStatus = 2;
                 }
             }
+            if (currentStatus == 3)
+            {
+                system("cls");
+                cout << "Write your year: ";
+                short int inputt = 0;
+                cin >> inputt;
+                system("cls");
+                for (int i = 0; i < 4000; i++)
+                {
+                    BuildAVLTree(Root_AVL, result);
+                }
+                cout << " Num\t" << "||" << " Author" << "\t     "
+                    << "||" << " Title\t\t\t\t"
+                    << "||" << " Publisher\t\t"
+                    << "||" << " Year "
+                    << "||  Num ||\n";
+                cout << "========||===================||=================================||======================||======||======||\n";
+                LeftToRight(Root_AVL, 1, inputt);
+                cout << "========||===================||=================================||======================||======||======||\n";
+                currentStatus = 4;
+                break;
+            }
             break;
         case 116:
             if (currentStatus == 2)
@@ -469,7 +505,7 @@ int main()
                     << "||" << " Year "
                     << "||  Num ||\n";
                 cout << "========||===================||=================================||======================||======||======||\n";
-                LeftToRight(Root_AVL);
+                LeftToRight(Root_AVL, 0 , 0);
                 cout << "========||===================||=================================||======================||======||======||\n";
                 currentStatus = 3;
                 break;
