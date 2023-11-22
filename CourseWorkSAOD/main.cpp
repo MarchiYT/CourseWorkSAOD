@@ -379,54 +379,27 @@ int LeftToRight(Vertex* root, const int sost, short int inputt)
     }
 }
 
-int up(int n, double q, double* array, double chance[]) {
-    int i = 0, j = 0;
-    for (i = n - 2; i >= 1; i--) {
-        if (array[i - 1] < q) array[i] = array[i - 1];
-        else {
-            j = i;
-            break;
+void Shanon(const int n, double* chance_l, int* L, char** c, double* p)
+{
+    double q[4000];
+    q[0] = 0;
+    L[0] = -floor(log2(p[0]));
+    for (int i = 1; i <= n; ++i)
+    {
+        q[i] = q[i - 1] + p[i - 1];
+        L[i] = -floor(log2(p[i]));
+    }
+    for (int i = 1; i <= n; ++i) 
+    {
+        for (int j = 0; j <= L[i - 1]; ++j)
+        {
+            q[i - 1] *= 2;
+            c[i - 1][j] = floor(q[i - 1]) + '0';
+            if (q[i - 1] >= 1)
+            {
+                q[i - 1] -= 1;
+            }
         }
-        if ((i - 1) == 0 && chance[i - 1] < q) {
-            j = 0;
-            break;
-        }
-    }
-    array[j] = q;
-    return j;
-}
-
-void down(int n, int j, int* Length, char** c) {
-    char pref[20]{};
-    for (int i = 0; i < 20; i++) pref[i] = c[j][i];
-    int l = Length[j];
-    for (int i = j; i < n - 2; i++) {
-        for (int k = 0; k < 20; k++)
-            c[i][k] = c[i + 1][k];
-        Length[i] = Length[i + 1];
-    }
-    for (int i = 0; i < 20; i++) {
-        c[n - 2][i] = pref[i];
-        c[n - 1][i] = pref[i];
-    }
-    c[n - 1][l] = '1';
-    c[n - 2][l] = '0';
-    Length[n - 1] = l + 1;
-    Length[n - 2] = l + 1;
-}
-
-void huffman(int n, double* array, int* Length, char** c, double chance[]) {
-    if (n == 2) {
-        c[0][0] = '0';
-        Length[0] = 1;
-        c[1][0] = '1';
-        Length[1] = 1;
-    }
-    else {
-        double q = array[n - 2] + array[n - 1];
-        int j = up(n, q, array, chance);
-        huffman(n - 1, array, Length, c, chance);
-        down(n, j, Length, c);
     }
 }
 
@@ -503,23 +476,24 @@ int coding()
 
     }
 
-    huffman(n, chance_l, Length, c, p);
-    std::cout << "\nHaffmanCode:\n";
-    std::cout << "\nCh  Prob      Code\n";
+    Shanon(n, chance_l, Length, c, p);
+    std::cout << "\nShanon:\n";
+    std::cout << "\nCh \t|| Prob    || Code ||\n";
     double avg_len = 0;
     double entropy = 0;
     for (int i = 0; i < n; i++) {
         avg_len += Length[i] * p[i];
         entropy -= p[i] * log2(p[i]);
-        printf("%c | %.5lf | ", probabilities[i].second, p[i]);
+        printf("%c \t|| %.5lf || ", probabilities[i].second, p[i]);
         for (int j = 0; j < Length[i]; ++j) {
             printf("%c", c[i][j]);
         }
-        std::cout << '\n';
+        std::cout << " || \n";
     }
+    std::cout << "========||=========||=================||\n";
     std::cout << "Average length = " << avg_len << std::endl
         << "Entropy = " << entropy << std::endl
-        << "Average length <" << entropy + 1 << std::endl
+        << avg_len <<" < " << entropy + 1 << std::endl
         << "N = " << n << std::endl << std::endl;
 
     system("pause");
