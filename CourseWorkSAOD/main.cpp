@@ -210,7 +210,7 @@ void printQueue(const MyQueue& result, int currentPage)
     }
     cout << "========||===================||=================================||======================||======||======||\n";
     cout << "'<-' Previous page" << "\t\t\t      " << "Exit 'ESC'" << "      \t\t\t" << "Next page '->'\n";
-    cout << "'A' First page" << "\t\t     " << "Sort and unsort 'S'" << "      " << "Binary search 'F'" << "      \t" << "Last page 'D'\n";
+    cout << "'A' First page" << "\t   " << "Sort and unsort 'S'" << "    " << "Binary search 'F'" << "    " << "Build tree 'T'" << "  \t" << "Last page 'D'\n";
 }
 
 int display(int i, int sum, record** index)
@@ -230,7 +230,7 @@ int display(int i, int sum, record** index)
     }
     cout << "========||===================||=================================||======================||======||======||\n";
     cout << "'<-' Previous page" << "\t\t\t      " << "Exit 'ESC'" << "      \t\t\t" << "Next page '->'\n";
-    cout << "'A' First page" << "\t\t     " << "Sort and unsort 'S'" << "      " << "Binary search 'F'" << "      \t" << "Last page 'D'\n";
+    cout << "'A' First page" << "\t   " << "Sort and unsort 'S'" << "    " << "Binary search 'F'" << "    " << "Build tree 'T'" << "  \t" << "Last page 'D'\n";
     return 0;
 }
 
