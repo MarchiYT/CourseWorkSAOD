@@ -234,15 +234,12 @@ int display(int i, int sum, record** index)
     return 0;
 }
 
-/*АВЛ-Дерево*/
 struct Vertex
 {
     MyQueue Data;
     Vertex* Left = nullptr;
     Vertex* Right = nullptr;
 };
-
-/*Вращения*/
 
 Vertex* LLRotation(Vertex* root)
 {
@@ -272,7 +269,6 @@ Vertex* RLRotation(Vertex* root)
     return RRRotation(root);
 }
 
-/*Высота дерева*/
 int TreeHeight(Vertex* vertex)
 {
     if (vertex == nullptr)
@@ -287,7 +283,6 @@ int TreeHeight(Vertex* vertex)
     }
 }
 
-/*Построение дерева*/
 Vertex* BuildAVLTree(Vertex*& vertex, MyQueue value)
 {
     if (vertex == nullptr)
