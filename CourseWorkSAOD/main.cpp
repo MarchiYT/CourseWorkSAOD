@@ -299,34 +299,27 @@ Vertex* BuildAVLTree(Vertex*& vertex, MyQueue value)
         vertex->Right = BuildAVLTree(vertex->Right, value);
     }
 
-    // Обновление баланса и проверка на нарушение баланса
     int balance = TreeHeight(vertex->Left) - TreeHeight(vertex->Right);
 
-    // Слева перевес (нужно выполнить вращение LL или LR)
     if (balance > 1)
     {
         if (value.head->data->year < vertex->Data.head->data->year)
         {
-            // Левое-Левое (LL) вращение
             vertex = LLRotation(vertex);
         }
         else
         {
-            // Левое-Правое (LR) вращение
             vertex = LRRotation(vertex);
         }
     }
-    // Справа перевес (нужно выполнить вращение RR или RL)
     else if (balance < -1)
     {
         if (value.head->data->year > vertex->Data.head->data->year)
         {
-            // Правое-Правое (RR) вращение
             vertex = RRRotation(vertex);
         }
         else
         {
-            // Правое-Левое (RL) вращение
             vertex = RLRotation(vertex);
         }
     }
